@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title></title>
+    <script src="../js/jquery-3.3.1.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/bootstrap.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/bootstrap-select.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" type="text/css" href="../css/boostrap/bootstrap.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/select/bootstrap-select.css"/>
+	<link rel="stylesheet" type="text/css" href="../css/button.css"/>
+</head>
+	<body background="../img/login-bg.png">
+		<div  style="margin-top:10px ;">
+			<a href="Pc_menuPage.html" style="color: white;">
+			<span class="glyphicon glyphicon-chevron-left" style="font-size: 15px;"></span><h4 style="display: inline;">返回</h4>
+			</a>
+        </div>
+		<form style="margin-top:20px;">
+		<div class="text-center">
+			<h1 id="h1" class="text-center"style="margin-bottom: 50px; color: white; text-align: center;" >退款申请 </h1>
+		</div>
+    	<div class="text-center" style="margin-bottom: 20px;">
+		</div>
+		<div class="text-center" style="margin-bottom: 20px;">
+		<div class="btn-group" style="text-align: center;" onchange="onchangeFun()">
+	    	<select id="select1" class="selectpicker"  style="text-align: center;" >
+			    <option value="1">全额退款</option>
+			    <option value="2">部分退款</option>
+			</select>
+		</div>
+		</div>
+		<div class="text-center" style="margin-bottom: 20px;">
+		<div class="btn-group" style="text-align: center;">
+	    	<select id="select2" class="selectpicker" style="text-align: center;" >
+			    <option value="0">领取现金</option>
+			    <!--<option value="1">微信转账</option>-->
+			</select>
+		</div>
+		</div>
+		<div class="text-center" style="margin-top: 20px;">
+			<input type="text" class="btn " style="width: 220px;" id="Amount" placeholder="退款金额" oninput = "value=value.replace(/[^\d]/g,'')" />
+		</div>
+		<div class="text-center" style="margin-top: 20px;">
+			<textarea style="width: 220px;height: 100px; text-align: center;"  id="inputContent" placeholder="退款理由"></textarea>
+		</div>
+        <div class="text-center" style="margin-top:20px ;">
+        <input id="submitButton" type="button" class="btn btn-primary button-pill" onclick="onclick_function()" value="确定" style="width: 200px;font-size: 25px;"></input>
+        </div>
+    </form>
+	</body>
+	<script type="text/javascript">
+		//获取存取变量
+	    var url_header=localStorage.getItem("url_header");
+		var personId=localStorage.getItem("personId");
+		var imfor=localStorage.getItem("InformationNum");
+		var personName=localStorage.getItem("Name");
+		var Tel=localStorage.getItem("Tel");
+		
+		document.getElementById("Amount").style.display="none";
+		
+		function onchangeFun () {
+			 var dis=document.getElementById("Amount").style.display
+			if(dis=="none"){
+				document.getElementById("Amount").style.display="";
+			}
+			else{
+				document.getElementById("Amount").style.display="none";
+			}
+		}
+		
+		function onclick_function () {
+			
+			var refundTypeBool=$("#select1").val();//全额或者部分退款
+			var moneyTypeBool=$("#select2").val();//全额或者部分退款
+			var moneyAmount=$("#Amount").val();
+			var record_url=""
+			var type1;
+			if(refundTypeBool=="1"){
+				record_url=url_header+"/Interface/Refund/AppRefundLog.ashx?InformationNum="+imfor+"&Name="+personName+"&WorkUnit="+Tel+"&RefundType="+refundTypeBool+"&RefundClass="+moneyTypeBool+"&RefundCause="+$("#inputContent").val();
+			}
+			else{
+				record_url=url_header+"/Interface/Refund/AppRefundLog.ashx?InformationNum="+imfor+"&Name="+personName+"&WorkUnit="+Tel+"&RefundType="+refundTypeBool+"&RefundAmount="+moneyAmount+"&RefundClass="+moneyTypeBool+"&RefundCause="+$("#inputContent").val();
+			}
+			$.ajax({
+	                    url:record_url,
+	                    data:{'new':'ssss'},
+	                    dataType:'json', 
+	                    type:'post',
+						async:false,
+	                    crossDomain: true, 
+	                    success:function(result){
+							if(result.Msg=="退款申请成功"){
+								alert("申请成功！");
+								location.href="Pc_menuPage.html";
+							}
+							else{
+								alert("申请失败，原因："+result.Msg);
+							}
+								}});
+		}
+		
+	</script>
+</html>
