@@ -26,8 +26,8 @@
 		<div class="text-center" style="margin-bottom: 20px;">
 		<div class="btn-group" style="text-align: center;">
 	    	<select id="select1" class="selectpicker"  style="text-align: center;" onchange="onchangeFun()" >
-			    <option value="1">全额退款</option>
-			    <option value="2">部分退款</option>
+			    <option value="0">全额退款</option>
+			    <option value="1">部分退款</option>
 			</select>
 		</div>
 		</div>
@@ -57,11 +57,13 @@
 		var imfor=localStorage.getItem("InformationNum");
 		var personName=localStorage.getItem("Name");
 		var Tel=localStorage.getItem("Tel");
+		var money = localStorage.getItem("money");
+		$("#Amount").attr('placeholder',"余额："+money+"元");
 		
 		document.getElementById("Amount").style.display="none";
 		
 		function onchangeFun () {
-			 var dis=document.getElementById("Amount").style.display
+			var dis=document.getElementById("Amount").style.display
 			if(dis=="none"){
 				document.getElementById("Amount").style.display="";
 			}
@@ -77,13 +79,21 @@
 			
 			var record_url=""
 			var type1;
-			if(refundTypeBool=="1"){
+			
+			if(moneyAmount==""&refundTypeBool=="1"){
+				alert("所填金额不可为空");return;
+			}
+			if(parseInt(moneyAmount)>parseInt(money)){
+				alert("所填金额不可大于余额");return;
+			}
+			
+			
+			if(refundTypeBool=="0"){
 				record_url=url_header+"/Interface/Refund/AppRefundLog.ashx?InformationNum="+imfor+"&Name="+personName+"&WorkUnit="+Tel+"&RefundType="+refundTypeBool+"&RefundClass="+moneyTypeBool+"&RefundCause="+$("#inputContent").val();
 			}
 			else{
 				record_url=url_header+"/Interface/Refund/AppRefundLog.ashx?InformationNum="+imfor+"&Name="+personName+"&WorkUnit="+Tel+"&RefundType="+refundTypeBool+"&RefundAmount="+moneyAmount+"&RefundClass="+moneyTypeBool+"&RefundCause="+$("#inputContent").val();
 			}
-			
 			
 			$.ajax({
 	                    url:record_url,
@@ -95,6 +105,7 @@
 	                    success:function(result){
 							if(result.Msg=="退款申请成功"){
 								alert("申请成功！");
+								ReflashMoney();
 								location.href="Worker_menuPage.html";
 							}
 							else{
@@ -102,6 +113,17 @@
 							}
 								}});
 		}
-		
+			function ReflashMoney () {
+			$.ajax({
+                    url:url_header+"/Interface/Common/GetStaff.ashx?informationNum="+imfor,
+                    data:{'name':'ssss'},
+                    dataType:'json',  //【这里要小心啊，不要用jsonp，一定是json】
+                    type:'post',
+					async:false,
+                    crossDomain: true,  //【这个很重要，一定要加】
+                    success:function(result){
+					localStorage.setItem("account",account);
+				}});
+			}
 	</script>
 </html>
